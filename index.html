@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question List - OPIC Helper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Question List</h1>
+        <div id="progress-bar-container">
+            <div id="progress-bar-text">0/0</div>
+            <div id="progress-bar-fill"></div>
+        </div>
+        <div class="group-selector-container">
+            <label for="group-selector">Select Group:</label>
+            <select id="group-selector"></select>
+        </div>
+        <div id="question-list"></div>
+        <div class="footer">
+            <button id="download-all-results-btn" disabled>Download All Results</button>
+            <input type="checkbox" id="include-audio-checkbox" name="include-audio" style="margin-left: 10px;">
+            <label for="include-audio-checkbox">Include audio</label>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+    "name": "OPIC Helper",
+    "short_name": "OPIC",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#fff",
+    "description": "A simple app to practice for the OPIC test.",
+    "icons": [{
+        "src": "icon.png",
+        "sizes": "192x192",
+        "type": "image/png"
+    }]
+}

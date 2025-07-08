@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPIC Helper</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <h1>OPIC Helper</h1>
+        <a href="index.html" class="btn-back">&lt; Back to Question List</a>
+        <div id="main-content">
+            <div class="card">
+                <h2>Question</h2>
+                <p id="question-text">Load a questions file to begin.</p>
+            </div>
+            <div class="card">
+                <h2>Your Answer</h2>
+                <button id="record-btn" class="record-btn"><span></span></button>
+                <div id="timer-display">00:00</div>
+                <audio id="audio-playback" controls></audio>
+            </div>
+            <div class="card">
+                <h2>Results</h2>
+                <div id="results-container"></div>
+            </div>
+        </div>
+        <div class="footer">
+            
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="practice.js"></script>
+</body>
+</html>

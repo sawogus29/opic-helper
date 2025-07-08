@@ -1,0 +1,224 @@
+body {
+    font-family: sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #007bff;
+}
+
+#progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    margin: 15px 0;
+    height: 25px; /* Height of the progress bar */
+    position: relative;
+    overflow: hidden; /* Ensures fill stays within bounds */
+}
+
+#progress-bar-fill {
+    height: 100%;
+    width: 0%; /* Initial width */
+    background-color: #28a745; /* Green color for progress */
+    border-radius: 5px;
+    transition: width 0.5s ease-in-out; /* Smooth transition for width changes */
+}
+
+#progress-bar-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 25px; /* Vertically center text */
+    color: #333; /* Text color */
+    font-weight: bold;
+    z-index: 1; /* Ensure text is above the fill */
+}
+
+.card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#audio-playback {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+input[type="file"], input[type="password"] {
+    margin: 10px 0;
+}
+
+/* Question List Styling */
+#question-list {
+    padding: 10px;
+    background-color: #f0f2f5; /* Light grey background for the list container */
+    border-radius: 8px; /* Match container border-radius */
+}
+
+.question-item {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+.question-item.question-done {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDUiIHN0cm9rZT0iIzI4YTc0NSIgc3Ryb2tlLXdpZHRoPSIxNSIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik0yMCA1MCBMNDAgNzAgTDgwIDMwIiBzdHJva2U9IiMyOGE3NDUiIHN0cm9rZS13aWR0aD0iMTAiIGZpbGw9Im5vbmUiLz48L3N2Zz4=");
+    background-repeat: no-repeat;
+    background-position: center right 15px;
+    background-size: 3em;
+}
+
+.question-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.question-item a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    display: block; /* Make the entire box clickable */
+}
+
+.check-mark {
+    color: #28a745; /* Green color for the check mark */
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.btn-back {
+    display: inline-block;
+    background-color: #fff; /* White background */
+    color: #495057; /* Dark text color */
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da; /* Add a border */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-back:hover {
+    background-color: #f8f9fa; /* Slightly off-white on hover */
+    border-color: #adb5bd;
+}
+
+/* Two-State Record Button */
+.record-btn {
+    width: 64px;
+    height: 64px;
+    background-color: #dc3545; /* Red circle */
+    border: 8px solid #e0e0e0; /* Wider light grey border */
+    border-radius: 50%;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.record-btn.recording {
+    background-color: #343a40; /* Dark grey circle */
+    border-color: #343a40; /* Matching border */
+    transition: box-shadow 0.05s ease-in-out;
+}
+
+.record-btn span {
+    display: block;
+    width: 0;
+    height: 0;
+    background-color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+.record-btn.recording span {
+    width: 24px; /* White square */
+    height: 24px;
+}
+
+#timer-display {
+    font-size: 24px;
+    color: #6c757d;
+    margin-top: 15px;
+    font-family: monospace;
+}
+
+#results-container {
+    width: 100%;
+    text-align: left;
+}
+
+#results-container h4 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    color: #007bff;
+}
+
+#results-container p {
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+}
+
+.question-group {
+    margin-bottom: 20px;
+}
+
+.question-group h3 {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
