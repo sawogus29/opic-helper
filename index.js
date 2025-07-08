@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (authToken) {
         try {
-            const decoded = atob(authToken);
+            const decoded = atob(decodeURIComponent(authToken));
             const [dateString, key] = decoded.split(':');
             const tokenDate = new Date(dateString);
             const today = new Date();
