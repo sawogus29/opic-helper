@@ -1,3 +1,5 @@
+import { loadData } from './db.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Handle auth_token from URL and localStorage
     const urlParams = new URLSearchParams(window.location.search);
@@ -31,27 +33,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         geminiApiKey = localStorage.getItem('gemini_api_key');
     }
 
-    // You can now use geminiApiKey in your application
-    // For example, if you need to pass it to another script or function:
-    // console.log('GEMINI_API_KEY:', geminiApiKey);
     const questionListContainer = document.getElementById('question-list');
     const downloadAllResultsBtn = document.getElementById('download-all-results-btn');
     const includeAudioCheckbox = document.getElementById('include-audio-checkbox');
     const groupSelector = document.getElementById('group-selector');
     const progressBarText = document.getElementById('progress-bar-text');
     const progressBarFill = document.getElementById('progress-bar-fill');
-    let hasPracticeData = false;
     let questions = [];
     let groupedQuestions = {};
 
-    function updateProgressBar() {
+    async function updateProgressBar() {
         const totalQuestions = questions.length;
         let doneCount = 0;
-        questions.forEach(question => {
-            if (localStorage.getItem(`opic_practice_${question.id}`) !== null) {
+        for (const question of questions) {
+            if (await loadData(question.id)) {
                 doneCount++;
             }
-        });
+        }
         progressBarText.textContent = `${doneCount}/${totalQuestions}`;
         const progressPercentage = totalQuestions > 0 ? (doneCount / totalQuestions) * 100 : 0;
         progressBarFill.style.width = `${progressPercentage}%`;
@@ -68,8 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }));
             groupQuestions();
             populateGroupSelector();
-            displayGroup(Object.keys(groupedQuestions)[0]);
-            updateProgressBar();
+            await displayGroup(Object.keys(groupedQuestions)[0]);
+            await updateProgressBar();
         } catch (error) {
             console.error('Failed to load questions:', error);
             questionListContainer.textContent = 'Failed to load questions.';
@@ -96,9 +94,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function displayGroup(groupId) {
+    async function displayGroup(groupId) {
         questionListContainer.innerHTML = '';
-        hasPracticeData = false;
+        let hasPracticeData = false;
 
         const groupContainer = document.createElement('div');
         groupContainer.classList.add('question-group');
@@ -107,11 +105,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         groupTitle.textContent = groupId.replace('_', ' ');
         groupContainer.appendChild(groupTitle);
 
-        groupedQuestions[groupId].forEach((questionData) => {
+        for (const questionData of groupedQuestions[groupId]) {
             const questionItem = document.createElement('div');
             questionItem.classList.add('question-item');
 
-            const isDone = localStorage.getItem(`opic_practice_${questionData.id}`) !== null;
+            const practiceData = await loadData(questionData.id);
+            const isDone = practiceData !== null && practiceData !== undefined;
 
             const questionLink = document.createElement('a');
             questionLink.href = `practice.html?id=${questionData.id}`;
@@ -124,37 +123,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             questionItem.appendChild(questionLink);
             groupContainer.appendChild(questionItem);
-        });
+        }
         questionListContainer.appendChild(groupContainer);
 
         downloadAllResultsBtn.disabled = !hasPracticeData;
     }
 
-    groupSelector.addEventListener('change', (event) => {
-        displayGroup(event.target.value);
+    groupSelector.addEventListener('change', async (event) => {
+        await displayGroup(event.target.value);
     });
 
     downloadAllResultsBtn.addEventListener('click', async () => {
         const includeAudio = includeAudioCheckbox.checked;
         const allResults = [];
-        
-        questions.forEach((questionData) => {
-            const data = localStorage.getItem(`opic_practice_${questionData.id}`);
+        const audioFiles = [];
+
+        for (const questionData of questions) {
+            const data = await loadData(questionData.id);
             if (data) {
-                const parsedData = JSON.parse(data);
                 const result = {
                     Question: questionData.question,
-                    Transcription: parsedData.results.transcription,
-                    RefinedVersion: parsedData.results.refined_version
+                    Transcription: data.results.transcription,
+                    RefinedVersion: data.results.refined_version
                 };
 
-                if (includeAudio && parsedData.audioDataUrl) {
+                if (includeAudio && data.audioBlob) {
                     const audioFileName = `question_${questionData.id}.webm`;
                     result['Audio File'] = `audio/${audioFileName}`;
+                    audioFiles.push({ name: audioFileName, blob: data.audioBlob });
                 }
                 allResults.push(result);
             }
-        });
+        }
 
         if (allResults.length > 0) {
             const worksheet = XLSX.utils.json_to_sheet(allResults);
@@ -175,16 +175,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const zip = new JSZip();
                 const audioFolder = zip.folder("audio");
 
-                questions.forEach((questionData) => {
-                    const data = localStorage.getItem(`opic_practice_${questionData.id}`);
-                    if (data) {
-                        const parsedData = JSON.parse(data);
-                        if (parsedData.audioDataUrl) {
-                            const audioFileName = `question_${questionData.id}.webm`;
-                            const audioData = parsedData.audioDataUrl.split(',')[1];
-                            audioFolder.file(audioFileName, audioData, {base64: true});
-                        }
-                    }
+                audioFiles.forEach(file => {
+                    audioFolder.file(file.name, file.blob);
                 });
 
                 const xlsxData = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });

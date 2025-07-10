@@ -1,3 +1,5 @@
+import { openDB, saveData, loadData } from './db.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const questionText = document.getElementById('question-text');
     const recordBtn = document.getElementById('record-btn');
@@ -16,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initializeApp() {
         try {
+            await openDB(); // Open the database initially
             const response = await fetch('questions.json');
             const data = await response.json();
             questions = data.map(item => ({
@@ -49,21 +52,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function loadPracticeData() {
-        const data = localStorage.getItem(`opic_practice_${currentQuestionId}`);
+    async function loadPracticeData() {
+        const data = await loadData(currentQuestionId);
         if (data) {
-            const parsedData = JSON.parse(data);
-            audioPlayback.src = parsedData.audioDataUrl;
-            displayResults(parsedData.results);
+            const audioUrl = URL.createObjectURL(data.audioBlob);
+            audioPlayback.src = audioUrl;
+            displayResults(data.results);
         }
     }
 
-    function savePracticeData(audioDataUrl, results) {
+    async function savePracticeData(audioBlob, results) {
         const data = {
-            audioDataUrl: audioDataUrl,
+            id: currentQuestionId,
+            audioBlob: audioBlob,
             results: results
         };
-        localStorage.setItem(`opic_practice_${currentQuestionId}`, JSON.stringify(data));
+        await saveData(data);
     }
 
     recordBtn.addEventListener('click', () => {
@@ -96,13 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const reader = new FileReader();
-            reader.onload = () => {
-                const dataUrl = reader.result;
-                audioPlayback.src = dataUrl;
-                analyzeSpeech(audioBlob, dataUrl);
-            };
-            reader.readAsDataURL(audioBlob);
+            const audioUrl = URL.createObjectURL(audioBlob);
+            audioPlayback.src = audioUrl;
+            analyzeSpeech(audioBlob);
             audioChunks = [];
         };
 
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         draw();
     }
 
-    async function analyzeSpeech(audioBlob, audioUrl) {
+    async function analyzeSpeech(audioBlob) {
         const apiKey = localStorage.getItem('gemini_api_key');
         if (!apiKey) {
             alert('Please set your Gemini API key using the query parameter (e.g., ?GEMINI_API_KEY=YOUR_KEY) or ensure it\'s stored in localStorage.');
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const resultJson = JSON.parse(data.candidates[0].content.parts[0].text);
 
             displayResults(resultJson);
-            savePracticeData(audioUrl, resultJson);
+            savePracticeData(audioBlob, resultJson);
 
         } catch (error) {
             console.error('Error with Gemini API:', error);
