@@ -214,11 +214,15 @@ input[type="file"], input[type="password"] {
 .match-card {
     border: 1px solid #ddd;
     border-radius: 4px;
-    padding: 10px;
+    padding: 0 0 10px 0;
     margin-bottom: 10px;
     background-color: #fff;
+}
+
+.match-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .favorite-btn {
@@ -241,8 +245,7 @@ input[type="file"], input[type="password"] {
     margin: 5px 0;
 }
 
-#results-container .match-card p:first-child {
-    /* color: #6c757d; */
+#results-container .match-card .match-card__transcription {
     background-color: #eee;
 }
 

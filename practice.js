@@ -271,11 +271,11 @@ document.addEventListener('DOMContentLoaded', () => {
         result.matches.forEach((match, index) => {
             matchesHtml += `
                 <div class="match-card">
-                    <button class="favorite-btn" data-id="${index}">☆</button>
-                    <div>
-                        <p>${match.transcription}</p>
-                        <p>${match.refined_version}</p>
+                    <div class="match-header">
+                        <button class="favorite-btn" data-id="${index}">☆</button>
                     </div>
+                    <p class="match-card__transcription">${match.transcription}</p>
+                    <p class="match-card__refined-version">${match.refined_version}</p>
                 </div>
             `;
         });
