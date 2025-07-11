@@ -3,6 +3,7 @@ import { openDB, saveData, loadData } from './db.js';
 document.addEventListener('DOMContentLoaded', () => {
     const questionText = document.getElementById('question-text');
     const recordBtn = document.getElementById('record-btn');
+    const analyzeBtn = document.getElementById('analyze-btn');
     const audioPlayback = document.getElementById('audio-playback');
     const resultsContainer = document.getElementById('results-container');
     const timerDisplay = document.getElementById('timer-display');
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let seconds = 0;
     let audioContext, analyser, dataArray, source, animationFrameId;
     let questions = [];
+    let currentAudioBlob = null;
 
     async function initializeApp() {
         try {
@@ -54,10 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadPracticeData() {
         const data = await loadData(currentQuestionId);
-        if (data) {
+        if (data && data.audioBlob) {
+            currentAudioBlob = data.audioBlob;
             const audioUrl = URL.createObjectURL(data.audioBlob);
             audioPlayback.src = audioUrl;
-            displayResults(data.results);
+            analyzeBtn.disabled = false;
+            if (data.results) {
+                displayResults(data.results);
+            }
         }
     }
 
@@ -78,11 +84,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    analyzeBtn.addEventListener('click', () => {
+        if (currentAudioBlob) {
+            analyzeSpeech(currentAudioBlob);
+        } else {
+            alert("No audio available to analyze. Please record an answer first.");
+        }
+    });
+
     async function startRecording() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             alert('Your browser does not support audio recording.');
             return;
         }
+
+        resultsContainer.innerHTML = '';
+        currentAudioBlob = null;
+        analyzeBtn.disabled = true;
 
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         
@@ -100,8 +118,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            currentAudioBlob = audioBlob;
             const audioUrl = URL.createObjectURL(audioBlob);
             audioPlayback.src = audioUrl;
+            analyzeBtn.disabled = false;
             analyzeSpeech(audioBlob);
             audioChunks = [];
         };
@@ -166,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         resultsContainer.innerHTML = '<p>Analyzing...</p>';
+        analyzeBtn.disabled = true;
 
         try {
             const uploadUrlResponse = await fetch('https://generativelanguage.googleapis.com/upload/v1beta/files', {
@@ -215,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     "contents": [{
                         "parts": [
-                            { "text": "Transcribe this audio and then provide a refined natural version of the transcription. Provide the output as a JSON object with two keys: 'transcription' and 'refined_version'." },
+                            { "text": "Transcribe this audio and then provide a refined natural version of the transcription. Provide the output as a JSON object with three keys: 'transcription', 'refined_version', and 'matches'. For each sentence in 'refined_version', the 'matches' array should contain an object with two keys: 'refined_version' (the sentence from 'refined_version') and 'transcription' (the corresponding part of the 'transcription')." },
                             { "file_data": { "mime_type": audioBlob.type, "file_uri": fileUri } }
                         ]
                     }],
@@ -238,15 +259,27 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error with Gemini API:', error);
             resultsContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+        } finally {
+            analyzeBtn.disabled = false;
         }
     }
 
     function displayResults(result) {
+        let matchesHtml = '';
+        if (result.matches && Array.isArray(result.matches)) {
+            matchesHtml = '<h4>Matches:</h4><ul>';
+            result.matches.forEach(match => {
+                matchesHtml += `<li><b>Refined Version:</b> ${match.refined_version}<br><b>Transcription:</b> ${match.transcription}</li>`;
+            });
+            matchesHtml += '</ul>';
+        }
+
         resultsContainer.innerHTML = `
             <h4>Transcription:</h4>
             <p>${result.transcription}</p>
             <h4>Refined Version:</h4>
             <p>${result.refined_version}</p>
+            ${matchesHtml}
         `;
     }
 
