@@ -211,6 +211,57 @@ input[type="file"], input[type="password"] {
     white-space: pre-wrap; /* Preserve whitespace and wrap text */
 }
 
+.diff-card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    background-color: #fff;
+}
+
+.diff-header {
+    background-color: #f7f7f7;
+    padding: 8px 12px;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.diff-body {
+    padding: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+}
+
+.diff-line {
+    padding: 5px 12px;
+    display: block;
+}
+
+.diff-line.diff-added {
+    background-color: #e6ffed;
+}
+
+.diff-line.diff-added::before {
+    content: '+ ';
+    color: #28a745;
+}
+
+.diff-line.diff-removed {
+    background-color: #ffeef0;
+}
+
+.diff-line.diff-removed::before {
+    content: '- ';
+    color: #dc3545;
+}
+
+.diff-line .highlight {
+    background-color: #fffbdd;
+    font-weight: bold;
+}
+
+
 .question-group {
     margin-bottom: 20px;
 }

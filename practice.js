@@ -264,24 +264,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function displayResults(result) {
-        let matchesHtml = '';
-        if (result.matches && Array.isArray(result.matches)) {
-            matchesHtml = '<h4>Matches:</h4><ul>';
-            result.matches.forEach(match => {
-                matchesHtml += `<li><b>Refined Version:</b> ${match.refined_version}<br><b>Transcription:</b> ${match.transcription}</li>`;
-            });
-            matchesHtml += '</ul>';
-        }
+    function createDiffHtml(text1, text2) {
+    const diff = Diff.diffWords(text1, text2);
+    let originalHtml = '<div class="diff-line diff-removed">';
+    let refinedHtml = '<div class="diff-line diff-added">';
 
-        resultsContainer.innerHTML = `
-            <h4>Transcription:</h4>
-            <p>${result.transcription}</p>
-            <h4>Refined Version:</h4>
-            <p>${result.refined_version}</p>
-            ${matchesHtml}
-        `;
+    diff.forEach((part) => {
+        if (part.added) {
+            refinedHtml += `<span class="highlight">${part.value}</span>`;
+        } else if (part.removed) {
+            originalHtml += `<span class="highlight">${part.value}</span>`;
+        } else {
+            originalHtml += `<span>${part.value}</span>`;
+            refinedHtml += `<span>${part.value}</span>`;
+        }
+    });
+
+    originalHtml += '</div>';
+    refinedHtml += '</div>';
+
+    return originalHtml + refinedHtml;
+}
+
+function displayResults(result) {
+    let matchesHtml = '';
+    if (result.matches && Array.isArray(result.matches)) {
+        matchesHtml = '<h4>Matches:</h4>';
+        result.matches.forEach(match => {
+            const diffHtml = createDiffHtml(match.transcription, match.refined_version);
+            matchesHtml += `
+                <div class="diff-card">
+                    <div class="diff-body">
+                        ${diffHtml}
+                    </div>
+                </div>
+            `;
+        });
     }
+
+    resultsContainer.innerHTML = `
+        <h4>Transcription:</h4>
+        <p>${result.transcription}</p>
+        <h4>Refined Version:</h4>
+        <p>${result.refined_version}</p>
+        ${matchesHtml}
+    `;
+}
 
     initializeApp();
 });
