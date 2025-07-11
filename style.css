@@ -256,9 +256,12 @@ input[type="file"], input[type="password"] {
     color: #dc3545;
 }
 
-.diff-line .highlight {
-    background-color: #fffbdd;
-    font-weight: bold;
+.diff-line.diff-removed .highlight {
+    background-color: #ffcecb;
+}
+
+.diff-line.diff-added .highlight {
+    background-color: #aceebb;
 }
 
 
