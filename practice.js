@@ -294,9 +294,7 @@ function displayResults(result) {
             const diffHtml = createDiffHtml(match.transcription, match.refined_version);
             matchesHtml += `
                 <div class="diff-card">
-                    <div class="diff-body">
-                        ${diffHtml}
-                    </div>
+                    <div class="diff-body">${diffHtml}</div>
                 </div>
             `;
         });
