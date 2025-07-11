@@ -211,59 +211,40 @@ input[type="file"], input[type="password"] {
     white-space: pre-wrap; /* Preserve whitespace and wrap text */
 }
 
-.diff-card {
+.match-card {
     border: 1px solid #ddd;
     border-radius: 4px;
-    margin-bottom: 15px;
+    padding: 10px;
+    margin-bottom: 10px;
     background-color: #fff;
+    display: flex;
+    align-items: flex-start;
 }
 
-.diff-header {
-    background-color: #f7f7f7;
-    padding: 8px 12px;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-}
-
-.diff-body {
+.favorite-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #ccc;
     padding: 0;
-    white-space: pre-wrap;
-    font-family: monospace;
+    margin-right: 10px;
 }
 
-.diff-line {
-    padding: 5px 12px;
-    display: block;
+.favorite-btn.favorited {
+    color: #ffc107;
 }
 
-.diff-line.diff-added {
-    background-color: #e6ffed;
+#results-container .match-card p {
+    background-color: transparent;
+    padding: 0 10px;
+    margin: 5px 0;
 }
 
-.diff-line.diff-added::before {
-    content: '+ ';
-    color: #28a745;
+#results-container .match-card p:first-child {
+    /* color: #6c757d; */
+    background-color: #eee;
 }
-
-.diff-line.diff-removed {
-    background-color: #ffeef0;
-}
-
-.diff-line.diff-removed::before {
-    content: '- ';
-    color: #dc3545;
-}
-
-.diff-line.diff-removed .highlight {
-    background-color: #ffcecb;
-}
-
-.diff-line.diff-added .highlight {
-    background-color: #aceebb;
-}
-
 
 .question-group {
     margin-bottom: 20px;

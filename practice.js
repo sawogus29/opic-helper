@@ -264,37 +264,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function createDiffHtml(text1, text2) {
-    const diff = Diff.diffWords(text1, text2);
-    let originalHtml = '<div class="diff-line diff-removed">';
-    let refinedHtml = '<div class="diff-line diff-added">';
-
-    diff.forEach((part) => {
-        if (part.added) {
-            refinedHtml += `<span class="highlight">${part.value}</span>`;
-        } else if (part.removed) {
-            originalHtml += `<span class="highlight">${part.value}</span>`;
-        } else {
-            originalHtml += `<span>${part.value}</span>`;
-            refinedHtml += `<span>${part.value}</span>`;
-        }
-    });
-
-    originalHtml += '</div>';
-    refinedHtml += '</div>';
-
-    return originalHtml + refinedHtml;
-}
-
-function displayResults(result) {
+    function displayResults(result) {
     let matchesHtml = '';
     if (result.matches && Array.isArray(result.matches)) {
         matchesHtml = '<h4>Matches:</h4>';
-        result.matches.forEach(match => {
-            const diffHtml = createDiffHtml(match.transcription, match.refined_version);
+        result.matches.forEach((match, index) => {
             matchesHtml += `
-                <div class="diff-card">
-                    <div class="diff-body">${diffHtml}</div>
+                <div class="match-card">
+                    <button class="favorite-btn" data-id="${index}">☆</button>
+                    <div>
+                        <p>${match.transcription}</p>
+                        <p>${match.refined_version}</p>
+                    </div>
                 </div>
             `;
         });
@@ -307,6 +288,16 @@ function displayResults(result) {
         <p>${result.refined_version}</p>
         ${matchesHtml}
     `;
+
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const matchId = e.target.dataset.id;
+            console.log(`Toggling favorite for match ${matchId}`);
+            // Here you would add logic to save the favorite state
+            e.target.classList.toggle('favorited');
+            e.target.textContent = e.target.classList.contains('favorited') ? '★' : '☆';
+        });
+    });
 }
 
     initializeApp();
