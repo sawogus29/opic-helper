@@ -252,11 +252,17 @@ input[type="file"], input[type="password"] {
 }
 
 #results-container p {
-    background-color: #e9ecef;
     padding: 10px;
     border-radius: 4px;
     white-space: pre-wrap; /* Preserve whitespace and wrap text */
 }
+
+#results-container .result__transcription,
+#results-container .result__refined-version {
+    background-color: #e9ecef;
+}
+
+
 
 .match-card {
     border: 1px solid #ddd;

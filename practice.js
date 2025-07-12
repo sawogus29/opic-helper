@@ -303,9 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resultsContainer.innerHTML = `
             <h4>Transcription:</h4>
-            <p>${result.transcription}</p>
+            <p class="result__transcription">${result.transcription}</p>
             <h4>Refined Version:</h4>
-            <p>${result.refined_version}</p>
+            <p class="result__refined-version">${result.refined_version}</p>
             ${matchesHtml}
         `;
 
