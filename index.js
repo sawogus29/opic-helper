@@ -1,4 +1,4 @@
-import { loadData } from './db.js';
+import { loadData, getAllData } from './db.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Handle auth_token from URL and localStorage
@@ -137,41 +137,71 @@ document.addEventListener('DOMContentLoaded', async () => {
         const includeAudio = includeAudioCheckbox.checked;
         const allResults = [];
         const audioFiles = [];
+        const favorites = [];
 
-        for (const questionData of questions) {
-            const data = await loadData(questionData.id);
-            if (data) {
+        const allData = await getAllData();
+
+        allData.forEach(record => {
+            const questionData = questions.find(q => q.id === record.id);
+            if (questionData) {
                 const result = {
+                    'Question ID': record.id,
                     Question: questionData.question,
-                    Transcription: data.results.transcription,
-                    RefinedVersion: data.results.refined_version
+                    Transcription: record.results.transcription,
+                    RefinedVersion: record.results.refined_version
                 };
 
-                if (includeAudio && data.audioBlob) {
-                    const audioFileName = `question_${questionData.id}.webm`;
+                if (includeAudio && record.audioBlob) {
+                    const audioFileName = `question_${record.id}.webm`;
                     result['Audio File'] = `audio/${audioFileName}`;
-                    audioFiles.push({ name: audioFileName, blob: data.audioBlob });
+                    audioFiles.push({ name: audioFileName, blob: record.audioBlob });
                 }
                 allResults.push(result);
             }
-        }
 
-        if (allResults.length > 0) {
-            const worksheet = XLSX.utils.json_to_sheet(allResults);
+            if (record.results && record.results.matches) {
+                record.results.matches.forEach(match => {
+                    if (match.isFavorite) {
+                        const favoriteEntry = {
+                            'Question ID': record.id,
+                            Transcription: match.transcription,
+                            RefinedVersion: match.refined_version,
+                            Highlight: ''
+                        };
+                        if (match.highlights) {
+                            favoriteEntry.Highlight = match.highlights.map(h => `(${h.startOffset}, ${h.endOffset})`).join(', ');
+                        }
+                        favorites.push(favoriteEntry);
+                    }
+                });
+            }
+        });
+
+        if (allResults.length > 0 || favorites.length > 0) {
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'All Results');
 
-            if (includeAudio) {
-                const range = XLSX.utils.decode_range(worksheet['!ref']);
-                for (let R = range.s.r + 1; R <= range.e.r; ++R) {
-                    const cell_address = {c:3, r:R};
-                    const cell_ref = XLSX.utils.encode_cell(cell_address);
-                    const cell = worksheet[cell_ref];
-                    if (cell && cell.v) {
-                        cell.l = { Target: cell.v, Tooltip: "Click to play" };
+            if (allResults.length > 0) {
+                const worksheet = XLSX.utils.json_to_sheet(allResults);
+                if (includeAudio) {
+                    const range = XLSX.utils.decode_range(worksheet['!ref']);
+                    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+                        const cell_address = {c:4, r:R}; // Adjusted for the new column
+                        const cell_ref = XLSX.utils.encode_cell(cell_address);
+                        const cell = worksheet[cell_ref];
+                        if (cell && cell.v) {
+                            cell.l = { Target: cell.v, Tooltip: "Click to play" };
+                        }
                     }
                 }
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'All Results');
+            }
 
+            if (favorites.length > 0) {
+                const favWorksheet = XLSX.utils.json_to_sheet(favorites);
+                XLSX.utils.book_append_sheet(workbook, favWorksheet, 'Favorites');
+            }
+
+            if (includeAudio && audioFiles.length > 0) {
                 const zip = new JSZip();
                 const audioFolder = zip.folder("audio");
 
