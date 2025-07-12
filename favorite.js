@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="match-card">
                     <div class="match-card-nav">
                         <a href="practice.html?id=${fav.questionId}" class="view-question-link">&#x1F875;</a>
-                        <button class="btn-fold">&#x02C4;</button>
+                        <button class="btn-fold">&#x02C5;</button>
                     </div>
-                    <p class="match-card__transcription">${fav.transcription}</p>
+                    <p class="match-card__transcription" style="display: none;">${fav.transcription}</p>
                     <p class="match-card__refined-version">${refinedVersionHtml}</p>
                 </div>
             `;
