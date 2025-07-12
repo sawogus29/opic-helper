@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             favoritesHtml += `
                 <div class="match-card">
                     <div class="match-card-nav">
-                        <a href="practice.html?id=${fav.questionId}" class="view-question-link">Go to question</a>
-                        <button class="btn-fold">Fold</button>
+                        <a href="practice.html?id=${fav.questionId}" class="view-question-link">&#x1F875;</a>
+                        <button class="btn-fold">&#x02C4;</button>
                     </div>
                     <p class="match-card__transcription">${fav.transcription}</p>
                     <p class="match-card__refined-version">${refinedVersionHtml}</p>
@@ -56,10 +56,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (transcription) {
                         if (transcription.style.display === 'none') {
                             transcription.style.display = 'block';
-                            event.target.textContent = 'Fold';
+                            event.target.innerHTML = '&#x02C4;';
                         } else {
                             transcription.style.display = 'none';
-                            event.target.textContent = 'Unfold';
+                            event.target.innerHTML = '&#x02C5;';
                         }
                     }
                 }

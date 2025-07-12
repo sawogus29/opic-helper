@@ -1,3 +1,6 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
 .highlight-btn {
     background: url('highlight-text.svg') no-repeat center center;
     background-size: contain;
@@ -14,45 +17,10 @@
     margin-right: 5px;
 }
 
-/* Modal Styles */
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1; 
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4); 
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; 
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; 
-}
-
-.close-btn {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close-btn:hover,
-.close-btn:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
 body {
     font-family: sans-serif;
     margin: 0;
-    padding: 20px;
+    /* padding: 20px; */
     background-color: #f0f2f5;
     color: #333;
 }
@@ -330,31 +298,43 @@ input[type="file"], input[type="password"] {
     background-color: #e9ecef;
 }
 
-.view-question-link {
-    display: inline-block;
-    padding: 5px 10px;
-    margin-top: 10px;
-    background-color: transparent;
-    border: 1px solid #007bff;
-    color: #007bff;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 0.9em;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
 
-.view-question-link:hover {
-    background-color: #007bff;
-    color: #fff;
-}
 
 .match-card-nav {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: 8px;
     border-bottom: 1px solid #eee;
 }
 
 .match-card-nav .view-question-link {
     margin-top: 0;
+}
+
+.view-question-link {
+    display: inline-block;
+    padding: 0;
+    margin-top: 0;
+    background-color: transparent;
+    border: none;
+    color: #ccc; /* Use a color that stands out but fits the theme */
+    text-decoration: none;
+    font-size: 1.2em; /* Adjust size to match fold button */
+    transition: color 0.3s ease;
+}
+
+.btn-fold {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #ccc; /* Use a color that stands out but fits the theme */
+    font-size: 1.5em; /* Adjust size as needed */
+    font-weight: 900;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.btn-fold:hover,
+.view-question-link:hover {
+    color: #aaa; /* Darker shade on hover */
 }
