@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="match-card">
                     <div class="match-card-nav">
                         <a href="practice.html?id=${fav.questionId}" class="view-question-link">Go to question</a>
+                        <button class="btn-fold">Fold</button>
                     </div>
                     <p class="match-card__transcription">${fav.transcription}</p>
                     <p class="match-card__refined-version">${refinedVersionHtml}</p>
@@ -46,6 +47,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         favoritesContainer.innerHTML = favoritesHtml;
+
+        favoritesContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('btn-fold')) {
+                const matchCard = event.target.closest('.match-card');
+                if (matchCard) {
+                    const transcription = matchCard.querySelector('.match-card__transcription');
+                    if (transcription) {
+                        if (transcription.style.display === 'none') {
+                            transcription.style.display = 'block';
+                            event.target.textContent = 'Fold';
+                        } else {
+                            transcription.style.display = 'none';
+                            event.target.textContent = 'Unfold';
+                        }
+                    }
+                }
+            }
+        });
 
     } catch (error) {
         console.error('Failed to load favorites:', error);
