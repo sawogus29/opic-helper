@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 matchesHtml += `
                     <div class="match-card">
                         <div class="match-header">
-                            <button class="highlight-btn" data-id="${index}">Highlight</button>
+                            <button class="highlight-btn" data-id="${index}"></button>
                             <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-id="${index}">${isFavorited ? '★' : '☆'}</button>
                         </div>
                         <p class="match-card__transcription">${match.transcription}</p>

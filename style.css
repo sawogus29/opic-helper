@@ -1,3 +1,19 @@
+.highlight-btn {
+    background: url('highlight-text.svg') no-repeat center center;
+    background-size: contain;
+    width: 2em;
+    height: 2em;
+    border: none;
+    cursor: pointer;
+    vertical-align: middle;
+    text-indent: -9999px; /* Hide the button text */
+}
+
+
+.match-header button {
+    margin-right: 5px;
+}
+
 /* Modal Styles */
 .modal {
     display: none; 
