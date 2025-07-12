@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioContext, analyser, dataArray, source, animationFrameId;
     let questions = [];
     let currentAudioBlob = null;
+    let currentResults = null;
 
     async function initializeApp() {
         try {
@@ -56,22 +57,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadPracticeData() {
         const data = await loadData(currentQuestionId);
-        if (data && data.audioBlob) {
-            currentAudioBlob = data.audioBlob;
-            const audioUrl = URL.createObjectURL(data.audioBlob);
-            audioPlayback.src = audioUrl;
-            analyzeBtn.disabled = false;
+        if (data) {
+            if (data.audioBlob) {
+                currentAudioBlob = data.audioBlob;
+                const audioUrl = URL.createObjectURL(data.audioBlob);
+                audioPlayback.src = audioUrl;
+                analyzeBtn.disabled = false;
+            }
             if (data.results) {
-                displayResults(data.results);
+                currentResults = data.results;
+                displayResults(currentResults);
             }
         }
     }
 
-    async function savePracticeData(audioBlob, results) {
+    async function savePracticeData() {
         const data = {
             id: currentQuestionId,
-            audioBlob: audioBlob,
-            results: results
+            audioBlob: currentAudioBlob,
+            results: currentResults,
         };
         await saveData(data);
     }
@@ -253,8 +257,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await generateContentResponse.json();
             const resultJson = JSON.parse(data.candidates[0].content.parts[0].text);
 
-            displayResults(resultJson);
-            savePracticeData(audioBlob, resultJson);
+            if (resultJson.matches && Array.isArray(resultJson.matches)) {
+                resultJson.matches.forEach(match => {
+                    match.isFavorite = false;
+                });
+            }
+
+            currentResults = resultJson;
+            displayResults(currentResults);
+            savePracticeData();
 
         } catch (error) {
             console.error('Error with Gemini API:', error);
@@ -265,40 +276,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayResults(result) {
-    let matchesHtml = '';
-    if (result.matches && Array.isArray(result.matches)) {
-        matchesHtml = '<h4>Matches:</h4>';
-        result.matches.forEach((match, index) => {
-            matchesHtml += `
-                <div class="match-card">
-                    <div class="match-header">
-                        <button class="favorite-btn" data-id="${index}">☆</button>
+        let matchesHtml = '';
+        if (result.matches && Array.isArray(result.matches)) {
+            matchesHtml = '<h4>Matches:</h4>';
+            result.matches.forEach((match, index) => {
+                const isFavorited = match.isFavorite || false;
+                matchesHtml += `
+                    <div class="match-card">
+                        <div class="match-header">
+                            <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-id="${index}">${isFavorited ? '★' : '☆'}</button>
+                        </div>
+                        <p class="match-card__transcription">${match.transcription}</p>
+                        <p class="match-card__refined-version">${match.refined_version}</p>
                     </div>
-                    <p class="match-card__transcription">${match.transcription}</p>
-                    <p class="match-card__refined-version">${match.refined_version}</p>
-                </div>
-            `;
+                `;
+            });
+        }
+
+        resultsContainer.innerHTML = `
+            <h4>Transcription:</h4>
+            <p>${result.transcription}</p>
+            <h4>Refined Version:</h4>
+            <p>${result.refined_version}</p>
+            ${matchesHtml}
+        `;
+
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const matchId = e.target.dataset.id;
+                toggleFavorite(matchId, e.target);
+            });
         });
     }
 
-    resultsContainer.innerHTML = `
-        <h4>Transcription:</h4>
-        <p>${result.transcription}</p>
-        <h4>Refined Version:</h4>
-        <p>${result.refined_version}</p>
-        ${matchesHtml}
-    `;
+    async function toggleFavorite(matchId, button) {
+        const match = currentResults.matches[parseInt(matchId)];
+        if (match) {
+            match.isFavorite = !match.isFavorite;
+            
+            button.classList.toggle('favorited', match.isFavorite);
+            button.textContent = match.isFavorite ? '★' : '☆';
 
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const matchId = e.target.dataset.id;
-            console.log(`Toggling favorite for match ${matchId}`);
-            // Here you would add logic to save the favorite state
-            e.target.classList.toggle('favorited');
-            e.target.textContent = e.target.classList.contains('favorited') ? '★' : '☆';
-        });
-    });
-}
+            await savePracticeData();
+        }
+    }
 
     initializeApp();
 });
