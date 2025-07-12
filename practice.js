@@ -329,10 +329,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (match) {
             match.isFavorite = !match.isFavorite;
             
+            if (!match.isFavorite) {
+                delete match.highlights;
+            }
+
             button.classList.toggle('favorited', match.isFavorite);
             button.textContent = match.isFavorite ? '★' : '☆';
 
             await savePracticeData();
+            displayResults(currentResults);
         }
     }
 
@@ -371,6 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     startOffset: selection.anchorOffset,
                     endOffset: selection.focusOffset
                 });
+                match.isFavorite = true;
                 await savePracticeData();
                 displayResults(currentResults);
             }
