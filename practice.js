@@ -281,13 +281,21 @@ document.addEventListener('DOMContentLoaded', () => {
             matchesHtml = '<h4>Matches:</h4>';
             result.matches.forEach((match, index) => {
                 const isFavorited = match.isFavorite || false;
+                let refinedVersionHtml = match.refined_version;
+                if (match.highlights) {
+                    match.highlights.forEach(h => {
+                        refinedVersionHtml = refinedVersionHtml.replace(h.text, `<mark>${h.text}</mark>`);
+                    });
+                }
+
                 matchesHtml += `
                     <div class="match-card">
                         <div class="match-header">
+                            <button class="highlight-btn" data-id="${index}">Highlight</button>
                             <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-id="${index}">${isFavorited ? '★' : '☆'}</button>
                         </div>
                         <p class="match-card__transcription">${match.transcription}</p>
-                        <p class="match-card__refined-version">${match.refined_version}</p>
+                        <p class="match-card__refined-version">${refinedVersionHtml}</p>
                     </div>
                 `;
             });
@@ -307,6 +315,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleFavorite(matchId, e.target);
             });
         });
+
+        document.querySelectorAll('.highlight-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const matchId = e.target.dataset.id;
+                openHighlightModal(matchId);
+            });
+        });
     }
 
     async function toggleFavorite(matchId, button) {
@@ -319,6 +334,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
             await savePracticeData();
         }
+    }
+
+    function openHighlightModal(matchId) {
+        const modal = document.getElementById('highlight-modal');
+        const modalText = document.getElementById('modal-text');
+        const saveBtn = document.getElementById('save-highlight-btn');
+        const closeBtn = document.querySelector('.close-btn');
+
+        const match = currentResults.matches[parseInt(matchId)];
+        if (!match) return;
+
+        modalText.textContent = match.refined_version;
+        modal.style.display = 'block';
+
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        saveBtn.onclick = async () => {
+            const selection = window.getSelection();
+            const selectedText = selection.toString().trim();
+
+            if (selectedText) {
+                if (!match.highlights) {
+                    match.highlights = [];
+                }
+                match.highlights.push({
+                    text: selectedText,
+                    startOffset: selection.anchorOffset,
+                    endOffset: selection.focusOffset
+                });
+                await savePracticeData();
+                displayResults(currentResults);
+            }
+            modal.style.display = 'none';
+        };
     }
 
     initializeApp();
