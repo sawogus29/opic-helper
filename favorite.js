@@ -36,8 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             favoritesHtml += `
                 <div class="match-card">
+                    <div class="match-card-nav">
+                        <a href="practice.html?id=${fav.questionId}" class="view-question-link">Go to question</a>
+                    </div>
+                    <p class="match-card__transcription">${fav.transcription}</p>
                     <p class="match-card__refined-version">${refinedVersionHtml}</p>
-                    <a href="practice.html?id=${fav.questionId}" class="view-question-link">Go to question</a>
                 </div>
             `;
         });

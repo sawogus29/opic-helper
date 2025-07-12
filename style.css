@@ -286,13 +286,13 @@ input[type="file"], input[type="password"] {
     color: #ffc107;
 }
 
-#results-container .match-card p {
+.match-card p {
     background-color: transparent;
     padding: 0 10px;
     margin: 5px 0;
 }
 
-#results-container .match-card .match-card__transcription {
+.match-card .match-card__transcription {
     background-color: #eee;
 }
 
@@ -340,4 +340,15 @@ input[type="file"], input[type="password"] {
 .view-question-link:hover {
     background-color: #007bff;
     color: #fff;
+}
+
+.match-card-nav {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.match-card-nav .view-question-link {
+    margin-top: 0;
 }
