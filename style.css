@@ -307,3 +307,37 @@ input[type="file"], input[type="password"] {
     border-radius: 5px;
     margin-bottom: 15px;
 }
+
+.nav-link {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    background-color: #f8f9fa;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 15px 0;
+    transition: background-color 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: #e9ecef;
+}
+
+.view-question-link {
+    display: inline-block;
+    padding: 5px 10px;
+    margin-top: 10px;
+    background-color: transparent;
+    border: 1px solid #007bff;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.view-question-link:hover {
+    background-color: #007bff;
+    color: #fff;
+}

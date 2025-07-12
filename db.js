@@ -66,4 +66,22 @@ function loadData(id) {
     });
 }
 
-export { openDB, saveData, loadData };
+function getAllData() {
+    return new Promise(async (resolve, reject) => {
+        const db = await openDB();
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.getAll();
+
+        request.onsuccess = (event) => {
+            resolve(event.target.result);
+        };
+
+        request.onerror = (event) => {
+            console.error('Failed to load all data:', event.target.error);
+            reject(event.target.error);
+        };
+    });
+}
+
+export { openDB, saveData, loadData, getAllData };
