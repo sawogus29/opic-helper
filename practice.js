@@ -283,8 +283,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isFavorited = match.isFavorite || false;
                 let refinedVersionHtml = match.refined_version;
                 if (match.highlights) {
+                    // Sort highlights by startOffset to avoid issues with string manipulation
+                    match.highlights.sort((a, b) => a.startOffset - b.startOffset);
+                    let offset = 0;
                     match.highlights.forEach(h => {
-                        refinedVersionHtml = refinedVersionHtml.replace(h.text, `<mark>${h.text}</mark>`);
+                        const start = h.startOffset + offset;
+                        const end = h.endOffset + offset;
+                        refinedVersionHtml = refinedVersionHtml.substring(0, start) + 
+                                             `<mark>` + 
+                                             refinedVersionHtml.substring(start, end) + 
+                                             `</mark>` + 
+                                             refinedVersionHtml.substring(end);
+                        offset += `<mark>`.length + `</mark>`.length;
                     });
                 }
 
