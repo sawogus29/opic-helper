@@ -317,9 +317,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelectorAll('.highlight-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const matchId = e.target.dataset.id;
-                openHighlightModal(matchId);
+                const match = currentResults.matches[parseInt(matchId)];
+                if (!match) return;
+
+                const selection = window.getSelection();
+                const selectedText = selection.toString().trim();
+
+                // Find the refined-version element associated with this match card
+                const matchCard = e.target.closest('.match-card');
+                const refinedVersionElement = matchCard ? matchCard.querySelector('.match-card__refined-version') : null;
+
+                if (selectedText && refinedVersionElement && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    // Check if the selection is within the refinedVersionElement
+                    if (refinedVersionElement.contains(range.commonAncestorContainer)) {
+                        if (!match.highlights) {
+                            match.highlights = [];
+                        }
+                        match.highlights.push({
+                            text: selectedText,
+                            startOffset: range.startOffset,
+                            endOffset: range.endOffset
+                        });
+                        match.isFavorite = true;
+                        await savePracticeData();
+                        displayResults(currentResults);
+                    }
+                }
             });
         });
     }
@@ -339,49 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await savePracticeData();
             displayResults(currentResults);
         }
-    }
-
-    function openHighlightModal(matchId) {
-        const modal = document.getElementById('highlight-modal');
-        const modalText = document.getElementById('modal-text');
-        const saveBtn = document.getElementById('save-highlight-btn');
-        const closeBtn = document.querySelector('.close-btn');
-
-        const match = currentResults.matches[parseInt(matchId)];
-        if (!match) return;
-
-        modalText.textContent = match.refined_version;
-        modal.style.display = 'block';
-
-        closeBtn.onclick = () => {
-            modal.style.display = 'none';
-        };
-
-        window.onclick = (event) => {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        };
-
-        saveBtn.onclick = async () => {
-            const selection = window.getSelection();
-            const selectedText = selection.toString().trim();
-
-            if (selectedText) {
-                if (!match.highlights) {
-                    match.highlights = [];
-                }
-                match.highlights.push({
-                    text: selectedText,
-                    startOffset: selection.anchorOffset,
-                    endOffset: selection.focusOffset
-                });
-                match.isFavorite = true;
-                await savePracticeData();
-                displayResults(currentResults);
-            }
-            modal.style.display = 'none';
-        };
     }
 
     initializeApp();
